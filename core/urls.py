@@ -7,4 +7,5 @@ def health_check(request):
 urlpatterns = [
     path('', health_check),
     path('up', health_check),
+    path('up/', health_check),
 ]
