@@ -99,7 +99,7 @@ resource "aws_ecs_task_definition" "app" {
         ]
       )
       
-      command = ["gunicorn","core.wsgi","--log-file","-"]
+      command = ["gunicorn","core.wsgi","-b","0.0.0.0:8000","--log-file","-"]
 
       portMappings = [
         {
