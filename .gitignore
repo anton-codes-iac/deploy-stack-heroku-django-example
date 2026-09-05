@@ -18,5 +18,3 @@ Thumbs.db
 __pycache__/
 db.sqlite3
 media/
-# deploy-stack backups
-*.bak.*

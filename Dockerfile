@@ -31,7 +31,7 @@ RUN apk del .build-deps
 COPY --chown=appuser:appgroup . .
 
 USER appuser
-EXPOSE 3000
+EXPOSE 8000
 
 # Run Gunicorn using the dynamically injected WSGI module
-CMD ["gunicorn", "--bind", "0.0.0.0:3000", "--workers", "3", "core.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "core.wsgi:application"]

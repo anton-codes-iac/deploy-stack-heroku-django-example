@@ -17,6 +17,9 @@ resource "aws_ecs_task_definition" "worker" {
       environment = [
         { "name": "NODE_ENV", "value": "production" },
         
+        { "name": "DB_HOST", "value": "${aws_db_instance.postgres.address}" },
+        { "name": "DB_PORT", "value": "5432" },
+        { "name": "DB_NAME", "value": "${aws_db_instance.postgres.db_name}" }
       ]
 
       secrets = concat(
@@ -27,7 +30,8 @@ resource "aws_ecs_task_definition" "worker" {
           }
         ],
         [
-          
+          { "name": "DB_USER", "valueFrom": "${aws_db_instance.postgres.master_user_secret[0].secret_arn}:username::" },
+        { "name": "DB_PASSWORD", "valueFrom": "${aws_db_instance.postgres.master_user_secret[0].secret_arn}:password::" }
         ]
       )
 

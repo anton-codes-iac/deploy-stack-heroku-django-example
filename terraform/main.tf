@@ -84,6 +84,9 @@ resource "aws_ecs_task_definition" "app" {
 
       environment = [
         
+        { "name": "DB_HOST", "value": "${aws_db_instance.postgres.address}" },
+        { "name": "DB_PORT", "value": "5432" },
+        { "name": "DB_NAME", "value": "${aws_db_instance.postgres.db_name}" }
       ]
 
       # Dynamically map every secret key found in the local JSON file
@@ -95,7 +98,8 @@ resource "aws_ecs_task_definition" "app" {
           }
         ],
         [
-          
+          { "name": "DB_USER", "valueFrom": "${aws_db_instance.postgres.master_user_secret[0].secret_arn}:username::" },
+        { "name": "DB_PASSWORD", "valueFrom": "${aws_db_instance.postgres.master_user_secret[0].secret_arn}:password::" }
         ]
       )
       
@@ -103,8 +107,8 @@ resource "aws_ecs_task_definition" "app" {
 
       portMappings = [
         {
-          containerPort = 3000
-          hostPort      = 3000
+          containerPort = 8000
+          hostPort      = 8000
           protocol      = "tcp"
         }
       ]
@@ -133,13 +137,13 @@ resource "aws_lb" "main" {
 
 resource "aws_lb_target_group" "app" {
   name        = "deploy-stack-heroku-django-tg"
-  port        = 3000
+  port        = 8000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
 
   health_check {
-    path                = "/"
+    path                = "/up"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
@@ -177,7 +181,7 @@ resource "aws_ecs_service" "app" {
   load_balancer {
     target_group_arn = aws_lb_target_group.app.arn
     container_name   = "deploy-stack-heroku-django-example-container"
-    container_port   = 3000
+    container_port   = 8000
   }
 
   depends_on = [aws_lb_listener.http]
